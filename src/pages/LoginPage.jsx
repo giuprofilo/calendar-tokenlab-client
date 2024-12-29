@@ -19,7 +19,15 @@ function LoginPage() {
     console.log("Botão de cadastrar foi clicado");
 
     try {
-      await axios.post("http://localhost:4000/user/login", form);
+      const response = await axios.post(
+        "http://localhost:4000/user/login",
+        form
+      );
+
+      //GUARDAR O TOKEN
+      const token = response.data.token;
+
+      localStorage.setItem("userToken", token);
 
       navigate("/calendar");
     } catch (error) {
