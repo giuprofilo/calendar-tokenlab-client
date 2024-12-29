@@ -24,17 +24,28 @@ function CalendarPage() {
 
   useEffect(() => {
     if (isLoggedIn) {
-      fetchEvents(); // Busca eventos apenas se o usuário estiver logado
+      fetchUserEvents(); // Busca eventos apenas se o usuário estiver logado
     }
   }, [isLoggedIn]);
 
   // Função para buscar eventos
-  const fetchEvents = async () => {
+  // const fetchEvents = async () => {
+  //   try {
+  //     const response = await api.get("/events");
+  //     setEvents(response.data);
+  //   } catch (error) {
+  //     console.error("Erro ao buscar eventos:", error);
+  //   }
+  // };
+
+  //Função para buscar eventos do usuario
+  const fetchUserEvents = async () => {
     try {
-      const response = await api.get("/events");
-      setEvents(response.data);
+      const response = await api.get("/user/profile"); // Rota que retorna o perfil do usuário com eventos
+      setEvents(response.data.eventos); // Atualiza o estado com os eventos do usuário
     } catch (error) {
       console.error("Erro ao buscar eventos:", error);
+      alert("Erro ao carregar eventos. Tente novamente mais tarde.");
     }
   };
 
@@ -69,8 +80,11 @@ function CalendarPage() {
 
       // Atualizar lista de eventos
       setEvents([...events, response.data]);
+      // Exibir mensagem de sucesso
+      alert("Evento criado com sucesso!");
       closeModal();
     } catch (error) {
+      alert("Não é possível criar mais de um evento no mesmo horário.");
       console.error("Erro ao criar evento:", error);
     }
   };
@@ -130,6 +144,7 @@ function CalendarPage() {
             value={form.description}
             onChange={handleInputChange}
             className="border rounded w-full p-2"
+            required
           />
         </div>
         <div className="mb-2">
@@ -140,6 +155,7 @@ function CalendarPage() {
             value={form.startTime}
             onChange={handleInputChange}
             className="border rounded w-full p-2"
+            required
           />
         </div>
         <div className="mb-2">
@@ -150,6 +166,7 @@ function CalendarPage() {
             value={form.endTime}
             onChange={handleInputChange}
             className="border rounded w-full p-2"
+            required
           />
         </div>
         <button
