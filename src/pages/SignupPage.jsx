@@ -1,7 +1,9 @@
 import { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function SignupPage() {
+  const navigate = useNavigate();
   const [form, setForm] = useState({
     name: "",
     email: "",
@@ -20,22 +22,14 @@ export default function SignupPage() {
     console.log("Botão de cadastrar foi clicado");
 
     try {
-      // Envia os dados do formulário diretamente
-      // console.log("Dados do formulário: ", form);
+      await axios.post("http://localhost:4000/user/signup", form);
 
-      // Faz a requisição para o endpoint de cadastro de usuário
-      const response = await axios.post(
-        "http://localhost:4000/user/signup",
-        form
-      );
-
-      console.log(response);
-
-      // Redireciona para a página de login
-      // navigate("/login");
+      navigate("/login");
     } catch (error) {
       // Tratar erros
-      // alert("Erro ao cadastrar usuário");
+      alert("Erro ao cadastrar usuário");
+      console.log(error);
+
       // console.error("Erro ao tentar cadastrar: ", error);
     }
   }
@@ -54,6 +48,7 @@ export default function SignupPage() {
             type="text"
             value={form.name}
             onChange={handleChange}
+            required
           />
         </div>
 
@@ -66,6 +61,7 @@ export default function SignupPage() {
             autoComplete="email"
             value={form.email}
             onChange={handleChange}
+            required
           />
         </div>
 
@@ -77,6 +73,7 @@ export default function SignupPage() {
             type="tel"
             value={form.telefone}
             onChange={handleChange}
+            required
           />
         </div>
 
@@ -88,6 +85,7 @@ export default function SignupPage() {
             type="password"
             value={form.password}
             onChange={handleChange}
+            required
           />
         </div>
 
