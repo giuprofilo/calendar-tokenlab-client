@@ -1,14 +1,16 @@
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 export default function ProtectRoute({ Component }) {
   const navigate = useNavigate();
   const token = localStorage.getItem("userToken");
 
-  if (token) {
-    //se o token existir ira mostrar o componente
-    return <Component />;
-  } else {
-    //s nao, redireciona para o login
-    navigate("/login");
-  }
+  useEffect(() => {
+    if (!token) {
+      //se o token nao existir, redireciona para o login
+      navigate("/login");
+    }
+  }, [navigate, token]);
+
+  return <Component />;
 }
