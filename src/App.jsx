@@ -4,6 +4,7 @@ import SignupPage from "./pages/SignupPage";
 import LoginPage from "./pages/LoginPage";
 import CalendarPage from "./pages/CalendarPage";
 import Navbar from "./components/Navbar";
+import ProtectRoute from "./components/ProtectRoute";
 
 function App() {
   return (
@@ -11,9 +12,14 @@ function App() {
       <Navbar />
       <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         <Routes>
+          {/* rotas nao protegidas */}
           <Route path="/" element={<SignupPage />} />
           <Route path="/login" element={<LoginPage />} />
-          <Route path="/calendar" element={<CalendarPage />} />
+          {/* rotas protegidas */}
+          <Route
+            path="/calendar"
+            element={<ProtectRoute Component={CalendarPage} />}
+          />
         </Routes>
       </div>
     </div>
