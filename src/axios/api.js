@@ -1,16 +1,19 @@
 import axios from "axios";
 
+//criando instancia do axios
 const api = axios.create({
   baseURL: "http://localhost:4000",
 });
 
-// Adicionando o interceptor de requisição para enviar o token no cabeçalho
+// adicionando o interceptor de requisição para enviar o token no cabeçalho
 api.interceptors.request.use(
   (config) => {
+    //pegando o token armazenado no localStorage
     const token = localStorage.getItem("userToken");
 
     if (token) {
-      // Adiciona o token ao cabeçalho Authorization
+      // se o token existir, configura a requisicao p ter um token Bearer
+      // e adiciona ao cabeçalho Authorization
 
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -18,7 +21,7 @@ api.interceptors.request.use(
     return config;
   },
   (error) => {
-    // Em caso de erro no interceptor, você pode manipular a falha aqui
+    // manipular a falha  em caso de erro no interceptor
     return Promise.reject(error);
   }
 );

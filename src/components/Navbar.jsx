@@ -9,7 +9,7 @@ function Navbar() {
 
   const handleLogout = () => {
     // limpa o token do localStorage
-    localStorage.removeItem("token");
+    localStorage.removeItem("userToken");
     //atualiza o estado de autenticacao
     setIsLoggedIn(false);
     //redireciona p pag inicial
