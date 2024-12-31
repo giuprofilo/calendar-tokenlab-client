@@ -13,6 +13,7 @@ function CalendarPage() {
   const { isLoggedIn } = useContext(AuthContext); // Obtem o status de login
 
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [selectedDate, setSelectedDate] = useState(null);
   const [form, setForm] = useState({
     description: "",
@@ -92,22 +93,41 @@ function CalendarPage() {
   // Exibir detalhes do evento
   const handleEventClick = (event) => {
     setEventDetails(event);
+    setForm({
+      description: event.description,
+      startTime: new Date(event.dateStart).toISOString().substr(11, 5),
+      endTime: new Date(event.dateEnd).toISOString().substr(11, 5),
+    });
+    setIsEditModalOpen(true);
+  };
+
+  const closeEditModal = () => {
+    setIsEditModalOpen(false);
+    setEventDetails(null);
+    setForm({ description: "", startTime: "", endTime: "" });
   };
 
   const handleEditEvent = async () => {
     try {
+      const dateStart = new Date(
+        `${eventDetails.dateStart.substr(0, 10)}T${form.startTime}`
+      );
+      const dateEnd = new Date(
+        `${eventDetails.dateEnd.substr(0, 10)}T${form.endTime}`
+      );
+
       const response = await api.put(`/event/edit/${eventDetails._id}`, {
         description: form.description,
-        dateStart: new Date(`${selectedDate}T${form.startTime}`),
-        dateEnd: new Date(`${selectedDate}T${form.endTime}`),
+        dateStart,
+        dateEnd,
       });
-      // Atualiza a lista de eventos
+
       setEvents(
         events.map((event) =>
           event._id === eventDetails._id ? response.data : event
         )
       );
-      setEventDetails(null); // Fecha o modal
+      closeEditModal();
       alert("Evento editado com sucesso!");
     } catch (error) {
       console.error("Erro ao editar evento:", error);
@@ -115,12 +135,26 @@ function CalendarPage() {
     }
   };
 
-  const handleDeleteEvent = async (eventId) => {
+  // const handleDeleteEvent = async (eventId) => {
+  //   if (window.confirm("Tem certeza que deseja excluir este evento?")) {
+  //     try {
+  //       await api.delete(`/event/delete/${eventId}`);
+  //       setEvents(events.filter((event) => event._id !== eventId)); // Atualiza a lista de eventos
+  //       setEventDetails(null); // Fecha o modal
+  //       alert("Evento excluído com sucesso!");
+  //     } catch (error) {
+  //       console.error("Erro ao excluir evento:", error);
+  //       alert("Erro ao excluir o evento. Tente novamente mais tarde.");
+  //     }
+  //   }
+  // };
+
+  const handleDeleteEvent = async () => {
     if (window.confirm("Tem certeza que deseja excluir este evento?")) {
       try {
-        await api.delete(`/event/delete/${eventId}`);
-        setEvents(events.filter((event) => event._id !== eventId)); // Atualiza a lista de eventos
-        setEventDetails(null); // Fecha o modal
+        await api.delete(`/event/delete/${eventDetails._id}`);
+        setEvents(events.filter((event) => event._id !== eventDetails._id));
+        closeEditModal();
         alert("Evento excluído com sucesso!");
       } catch (error) {
         console.error("Erro ao excluir evento:", error);
@@ -128,7 +162,6 @@ function CalendarPage() {
       }
     }
   };
-
   return (
     <div className="flex">
       {/* Calendário */}
@@ -142,7 +175,9 @@ function CalendarPage() {
             title: event.description,
             start: event.dateStart,
             end: event.dateEnd,
+            extendedProps: event,
           }))}
+          eventClick={(info) => handleEventClick(info.event.extendedProps)}
         />
       </div>
 
@@ -215,22 +250,57 @@ function CalendarPage() {
       {/* Modal para detalhes do evento */}
       {eventDetails && (
         <Modal
-          isOpen={!!eventDetails}
-          onRequestClose={() => setEventDetails(null)}
-          contentLabel="Detalhes do Evento"
-          className=" bg-white p-4 rounded shadow-md max-w-md mx-auto mt-20"
+          isOpen={isEditModalOpen}
+          onRequestClose={closeEditModal}
+          contentLabel="Editar Evento"
+          className="modal-content bg-white p-4 rounded shadow-md max-w-md mx-auto mt-20"
+          overlayClassName="modal-overlay"
         >
-          <h2 className="text-xl font-bold mb-4">{eventDetails.description}</h2>
-          <p>Data: {new Date(eventDetails.dateStart).toLocaleDateString()}</p>
-          <p>
-            Horário: {new Date(eventDetails.dateStart).toLocaleTimeString()} -{" "}
-            {new Date(eventDetails.dateEnd).toLocaleTimeString()}
-          </p>
+          <h2 className="text-xl font-bold mb-4">Editar Evento</h2>
+          <div className="mb-2">
+            <label className="block mb-1">Descrição:</label>
+            <input
+              type="text"
+              name="description"
+              value={form.description}
+              onChange={handleInputChange}
+              className="border rounded w-full p-2"
+              required
+            />
+          </div>
+          <div className="mb-2">
+            <label className="block mb-1">Hora de Início:</label>
+            <input
+              type="time"
+              name="startTime"
+              value={form.startTime}
+              onChange={handleInputChange}
+              className="border rounded w-full p-2"
+              required
+            />
+          </div>
+          <div className="mb-2">
+            <label className="block mb-1">Hora de Término:</label>
+            <input
+              type="time"
+              name="endTime"
+              value={form.endTime}
+              onChange={handleInputChange}
+              className="border rounded w-full p-2"
+              required
+            />
+          </div>
           <button
-            className="bg-red-500 text-white px-4 py-2 rounded mt-2"
-            onClick={() => setEventDetails(null)}
+            onClick={handleEditEvent}
+            className="bg-blue-500 text-white px-4 py-2 rounded mt-2 mr-2"
           >
-            Fechar
+            Salvar
+          </button>
+          <button
+            onClick={handleDeleteEvent}
+            className="bg-red-500 text-white px-4 py-2 rounded mt-2"
+          >
+            Excluir
           </button>
         </Modal>
       )}
