@@ -101,40 +101,6 @@ function LoginPage() {
       </div>
     </div>
   );
-  // return (
-  //   <div>
-  //     <h1>Login Page</h1>
-
-  //     <form onSubmit={handleSubmit}>
-  //       <div>
-  //         <label>Email</label>
-
-  //         <input
-  //           name="email"
-  //           type="email"
-  //           autoComplete="email"
-  //           value={form.email}
-  //           onChange={handleChange}
-  //           required
-  //         />
-  //       </div>
-
-  //       <div>
-  //         <label>Senha</label>
-
-  //         <input
-  //           name="password"
-  //           type="password"
-  //           value={form.password}
-  //           onChange={handleChange}
-  //           required
-  //         />
-  //       </div>
-
-  //       <button>Entrar</button>
-  //     </form>
-  //   </div>
-  // );
 }
 
 export default LoginPage;

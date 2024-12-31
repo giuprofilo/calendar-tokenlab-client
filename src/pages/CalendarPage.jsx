@@ -94,10 +94,45 @@ function CalendarPage() {
     setEventDetails(event);
   };
 
+  const handleEditEvent = async () => {
+    try {
+      const response = await api.put(`/event/edit/${eventDetails._id}`, {
+        description: form.description,
+        dateStart: new Date(`${selectedDate}T${form.startTime}`),
+        dateEnd: new Date(`${selectedDate}T${form.endTime}`),
+      });
+      // Atualiza a lista de eventos
+      setEvents(
+        events.map((event) =>
+          event._id === eventDetails._id ? response.data : event
+        )
+      );
+      setEventDetails(null); // Fecha o modal
+      alert("Evento editado com sucesso!");
+    } catch (error) {
+      console.error("Erro ao editar evento:", error);
+      alert("Erro ao editar o evento. Tente novamente mais tarde.");
+    }
+  };
+
+  const handleDeleteEvent = async (eventId) => {
+    if (window.confirm("Tem certeza que deseja excluir este evento?")) {
+      try {
+        await api.delete(`/event/delete/${eventId}`);
+        setEvents(events.filter((event) => event._id !== eventId)); // Atualiza a lista de eventos
+        setEventDetails(null); // Fecha o modal
+        alert("Evento excluído com sucesso!");
+      } catch (error) {
+        console.error("Erro ao excluir evento:", error);
+        alert("Erro ao excluir o evento. Tente novamente mais tarde.");
+      }
+    }
+  };
+
   return (
     <div className="flex">
       {/* Calendário */}
-      <div className="flex-1">
+      <div className="flex-1 p-6">
         <h1 className="text-2xl font-bold mb-4">Meu Calendário</h1>
         <FullCalendar
           plugins={[dayGridPlugin, interactionPlugin]} // Adiciona o plugin de interação
@@ -112,7 +147,7 @@ function CalendarPage() {
       </div>
 
       {/* Lista de eventos */}
-      <div className="w-1/3 ml-4">
+      <div className="w-1/3 p-6">
         <h2 className="text-xl font-bold mb-2">Eventos</h2>
         <ul>
           {events.map((event) => (
@@ -183,7 +218,7 @@ function CalendarPage() {
           isOpen={!!eventDetails}
           onRequestClose={() => setEventDetails(null)}
           contentLabel="Detalhes do Evento"
-          className="bg-white p-4 rounded shadow-md max-w-md mx-auto mt-20"
+          className=" bg-white p-4 rounded shadow-md max-w-md mx-auto mt-20"
         >
           <h2 className="text-xl font-bold mb-4">{eventDetails.description}</h2>
           <p>Data: {new Date(eventDetails.dateStart).toLocaleDateString()}</p>
